@@ -35,13 +35,6 @@ function noemptyreportmail_civicrm_alterReportVar($varType, &$var, $reportForm) 
  */
 function noemptyreportmail_civicrm_alterTemplateFile($formName, &$form, $context, &$tplName) {
   if (is_a($form, 'CRM_Report_Form')) {
-    // Assign the original template name to a template variable. This way:
-    // Our Empty.tpl (if it gets used) can include that original tpl file; and
-    // Other extensions can know the original tpl name (if they know to check for it this way).
-    // (We could do this conditionally after determining we have no rows, but
-    // then other extension devs would need to check it conditionally.)
-    $form->assign('noemptyreportmail_original_tpl', $tplName);
-
     $outputMode = $form->getVar('_outputMode');
     if ($outputMode == 'print') {
       $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
@@ -58,6 +51,11 @@ function noemptyreportmail_civicrm_alterTemplateFile($formName, &$form, $context
         // our noemptyreportmail_civicrm_alterReportVar().
         $form->assign('noemptyreportmail_rows_empty_marker', NOEMPTYREPORTMAIL_ROWS_EMPTY_MARKER);
         $tplName = "CRM/noemptyreportmail/Report/Empty.tpl";
+
+        // Assign the original template name to a template variable. This way:
+        // Our Empty.tpl (if it gets used) can include that original tpl file; and
+        // Other extensions can know the original tpl name (if they know to check for it).
+        $form->assign('noemptyreportmail_original_tpl', $tplName);
       }
     }
   }
