@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <extension key="com.joineryhq.noemptyreportmail" type="module">
   <file>noemptyreportmail</file>
-  <name>com.joineryhq.noemptyreportmail</name>
-  <description>FIXME</description>
+  <name>No Empty Report Mail</name>
+  <description>Prevent emailing of reports that contain no rows in the output.</description>
   <license>GPL-3.0</license>
   <maintainer>
     <author>Allen Shaw</author>
@@ -20,7 +20,7 @@
   <compatibility>
     <ver>5.0</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
+  <comments>Developed by Joinery for the CiviCRM community.</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
