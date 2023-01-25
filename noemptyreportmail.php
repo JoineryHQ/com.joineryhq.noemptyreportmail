@@ -23,7 +23,7 @@ function noemptyreportmail_civicrm_alterReportVar($varType, &$var, $reportForm) 
       // (For html output, we cannot get the instance id in hook_civicrm_alterMailParams(),
       // so we use a different method, see our hook_civicrm_alterTemplateFile().
       $instanceId = $reportForm->getVar('_id');
-      Civi::$statics['noemptyreportmail']['pdf_empty_report_'. $instanceId] = TRUE;
+      Civi::$statics['noemptyreportmail']['pdf_empty_report_' . $instanceId] = TRUE;
     }
   }
 }
@@ -34,11 +34,11 @@ function noemptyreportmail_civicrm_alterReportVar($varType, &$var, $reportForm) 
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterTemplateFile
  */
 function noemptyreportmail_civicrm_alterTemplateFile($formName, &$form, $context, &$tplName) {
-  if (is_a($form, 'CRM_Report_Form')) {      
+  if (is_a($form, 'CRM_Report_Form')) {
     // Assign the original template name to a template variable. This way:
     // Our Empty.tpl (if it gets used) can include that original tpl file; and
     // Other extensions can know the original tpl name (if they know to check for it this way).
-    // (We could do this conditionally after determining we have no rows, but 
+    // (We could do this conditionally after determining we have no rows, but
     // then other extension devs would need to check it conditionally.)
     $form->assign('noemptyreportmail_original_tpl', $tplName);
 
@@ -46,15 +46,15 @@ function noemptyreportmail_civicrm_alterTemplateFile($formName, &$form, $context
     if ($outputMode == 'print') {
       $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
       if (empty($tplVars['rows'])) {
-        // When processing a print report with empty rows, change the template to 
+        // When processing a print report with empty rows, change the template to
         // our wrapper, and assign a variable indicating there are now rows.
         // Our wrapper template will just print this indicator and then include
         // the original template file.
-        // If we're in the midst of mailing this report, this marker will be 
-        // detected in hook_civicrm_alterMailParams(), which will prevent the 
+        // If we're in the midst of mailing this report, this marker will be
+        // detected in hook_civicrm_alterMailParams(), which will prevent the
         // email from going out.
-        // (For pdf output, we cannot read the report content in 
-        // hook_civicrm_alterMailParams(), so we use a different method, see 
+        // (For pdf output, we cannot read the report content in
+        // hook_civicrm_alterMailParams(), so we use a different method, see
         // our noemptyreportmail_civicrm_alterReportVar().
         $form->assign('noemptyreportmail_rows_empty_marker', NOEMPTYREPORTMAIL_ROWS_EMPTY_MARKER);
         $tplName = "CRM/noemptyreportmail/Report/Empty.tpl";
@@ -76,7 +76,7 @@ function noemptyreportmail_civicrm_alterMailParams(&$params, $context) {
     elseif (($attachment = $params['attachments'][0]) && ($attachment['cleanName'] == 'CiviReport.csv')) {
       // If the attachment has one line, that's just the header; so there are no rows.
       $lineCount = count(file($attachment['fullPath']));
-      if ($lineCount == 1){
+      if ($lineCount == 1) {
         $params['abortMailSend'] = TRUE;
       }
     }
@@ -86,9 +86,9 @@ function noemptyreportmail_civicrm_alterMailParams(&$params, $context) {
       $reportUrlPath = parse_url($matches[1], PHP_URL_PATH);
       $pathParts = explode('/', $reportUrlPath);
       $instanceId = array_pop($pathParts);
-      if (Civi::$statics['noemptyreportmail']['pdf_empty_report_'. $instanceId]){
+      if (Civi::$statics['noemptyreportmail']['pdf_empty_report_' . $instanceId]) {
         $params['abortMailSend'] = TRUE;
-        unset(Civi::$statics['noemptyreportmail']['pdf_empty_report_'. $instanceId]);
+        unset(Civi::$statics['noemptyreportmail']['pdf_empty_report_' . $instanceId]);
       }
     }
   }
