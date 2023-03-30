@@ -14,7 +14,7 @@ define('NOEMPTYREPORTMAIL_ROWS_EMPTY_MARKER', 'NOEMPTYREPORTMAIL_ROWS_EMPTY_MARK
  */
 function noemptyreportmail_civicrm_alterReportVar($varType, &$var, $reportForm) {
   if ($varType == 'rows' && empty($var)) {
-    $outputMode = $reportForm->getVar('_outputMode');
+    $outputMode = $reportForm->getOutputMode();
     if ($outputMode == 'pdf') {
       // When processing a pdf report with empty rows, store note this instance id
       // in a static. If we're in the midst of mailing this report instance,
@@ -81,9 +81,9 @@ function noemptyreportmail_civicrm_alterMailParams(&$params, $context) {
     elseif (($attachment = $params['attachments'][0]) && ($attachment['cleanName'] == 'CiviReport.pdf')) {
       $matches = [];
       preg_match('/Report URL:\s+(http[^<\s]+)/', $params['html'], $matches);
-      $reportUrlPath = parse_url($matches[1], PHP_URL_PATH);
-      $pathParts = explode('/', $reportUrlPath);
-      $instanceId = array_pop($pathParts);
+      $reportUrl = $matches[1];
+      $instanceId = CRM_Noemptyreportmail_Util::getInstanceIdFromUrl($reportUrl);
+
       if (Civi::$statics['noemptyreportmail']['pdf_empty_report_' . $instanceId]) {
         $params['abortMailSend'] = TRUE;
         unset(Civi::$statics['noemptyreportmail']['pdf_empty_report_' . $instanceId]);
