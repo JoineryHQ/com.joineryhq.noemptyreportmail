@@ -39,6 +39,11 @@ function noemptyreportmail_civicrm_alterTemplateFile($formName, &$form, $context
     if ($outputMode == 'print') {
       $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
       if (empty($tplVars['rows'])) {
+        // Assign the original template name to a template variable. This way:
+        // Our Empty.tpl (if it gets used) can include that original tpl file; and
+        // Other extensions can know the original tpl name (if they know to check for it).
+        $form->assign('noemptyreportmail_original_tpl', $tplName);
+
         // When processing a print report with empty rows, change the template to
         // our wrapper, and assign a variable indicating there are now rows.
         // Our wrapper template will just print this indicator and then include
@@ -51,11 +56,6 @@ function noemptyreportmail_civicrm_alterTemplateFile($formName, &$form, $context
         // our noemptyreportmail_civicrm_alterReportVar().
         $form->assign('noemptyreportmail_rows_empty_marker', NOEMPTYREPORTMAIL_ROWS_EMPTY_MARKER);
         $tplName = "CRM/noemptyreportmail/Report/Empty.tpl";
-
-        // Assign the original template name to a template variable. This way:
-        // Our Empty.tpl (if it gets used) can include that original tpl file; and
-        // Other extensions can know the original tpl name (if they know to check for it).
-        $form->assign('noemptyreportmail_original_tpl', $tplName);
       }
     }
   }
@@ -79,8 +79,9 @@ function noemptyreportmail_civicrm_alterMailParams(&$params, $context) {
       }
     }
     elseif (($attachment = $params['attachments'][0]) && ($attachment['cleanName'] == 'CiviReport.pdf')) {
+      $reportUrlTs = ts('Report URL');
       $matches = [];
-      preg_match('/Report URL:\s+(http[^<\s]+)/', $params['html'], $matches);
+      preg_match('/' . $reportUrlTs . ':\s+(http[^<\s]+)/', $params['html'], $matches);
       $reportUrl = $matches[1];
       $instanceId = CRM_Noemptyreportmail_Util::getInstanceIdFromUrl($reportUrl);
 
