@@ -37,7 +37,7 @@ function noemptyreportmail_civicrm_alterTemplateFile($formName, &$form, $context
   if (is_a($form, 'CRM_Report_Form')) {
     $outputMode = $form->getVar('_outputMode');
     if ($outputMode == 'print') {
-      $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
+      $tplVars = CRM_Core_Smarty::singleton()->getTemplateVars();
       if (empty($tplVars['rows'])) {
         // Assign the original template name to a template variable. This way:
         // Our Empty.tpl (if it gets used) can include that original tpl file; and
